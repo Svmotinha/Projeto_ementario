@@ -6,6 +6,7 @@ interface StatCardProps {
   tone: StatTone
 }
 
+// Card reutilizavel para os indicadores principais do dashboard.
 function ToneIcon({ tone }: { tone: StatTone }) {
   if (tone === 'green') {
     return (

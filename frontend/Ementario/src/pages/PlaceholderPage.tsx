@@ -3,6 +3,8 @@ interface PlaceholderPageProps {
   description: string
 }
 
+// Componente temporario usado para rotas ja mapeadas,
+// mas que ainda nao possuem implementacao funcional completa.
 export function PlaceholderPage({ title, description }: PlaceholderPageProps) {
   return (
     <section className="placeholder-page">

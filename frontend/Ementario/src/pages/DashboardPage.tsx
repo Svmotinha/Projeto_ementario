@@ -3,6 +3,8 @@ import { RecentActivityPanel } from '../components/dashboard/RecentActivityPanel
 import { StatCard, type StatTone } from '../components/dashboard/StatCard'
 import type { DashboardResponse } from '../types/dashboard'
 
+// Esta pagina consome o endpoint agregado da API (/api/dashboard/)
+// e transforma o retorno em cards de metricas + lista de atividade recente.
 interface DashboardMetric {
   label: string
   value: number
@@ -37,6 +39,8 @@ export function DashboardPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  // Funcao unica de sincronizacao de dados da tela,
+  // reutilizada no carregamento inicial e no botao "Sincronizar".
   const loadDashboardData = useCallback(async () => {
     setIsLoading(true)
     setErrorMessage(null)
@@ -59,10 +63,12 @@ export function DashboardPage() {
     }
   }, [])
 
+  // Dispara a primeira carga quando a pagina e aberta.
   useEffect(() => {
     void loadDashboardData()
   }, [loadDashboardData])
 
+  // Adapta o formato de dados da API para o formato esperado pelos cards.
   const metrics = useMemo<DashboardMetric[]>(() => {
     return [
       { label: 'Total de Cursos', value: dashboardData.metrics.total_cursos, tone: 'teal' },

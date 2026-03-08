@@ -5,6 +5,7 @@ interface RecentActivityPanelProps {
   isLoading?: boolean
 }
 
+// Lista os ultimos itens atualizados no backend e seus respectivos status.
 export function RecentActivityPanel({ items, isLoading = false }: RecentActivityPanelProps) {
   return (
     <section className="activity-panel">
@@ -12,7 +13,7 @@ export function RecentActivityPanel({ items, isLoading = false }: RecentActivity
         <h2>Atividade Recente</h2>
         <button type="button" className="activity-panel__view-all">
           Ver todos
-          <span aria-hidden="true">→</span>
+          <span aria-hidden="true">-&gt;</span>
         </button>
       </header>
 

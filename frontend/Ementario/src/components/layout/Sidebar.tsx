@@ -1,9 +1,5 @@
+import { NavLink } from 'react-router-dom'
 import { navigationItems, type NavigationKey, type NavigationSection } from '../../types/navigation'
-
-interface SidebarProps {
-  activeItem: NavigationKey
-  onSelect: (key: NavigationKey) => void
-}
 
 const sidebarSections: NavigationSection[] = ['Navegacao', 'Sistema']
 
@@ -44,7 +40,8 @@ function NavIcon({ itemKey }: { itemKey: NavigationKey }) {
   )
 }
 
-export function Sidebar({ activeItem, onSelect }: SidebarProps) {
+// Sidebar de navegacao global com links reais do React Router.
+export function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -62,18 +59,16 @@ export function Sidebar({ activeItem, onSelect }: SidebarProps) {
             {navigationItems
               .filter((item) => item.section === section)
               .map((item) => (
-                <button
+                <NavLink
                   key={item.key}
-                  type="button"
-                  className={`sidebar__link ${item.key === activeItem ? 'is-active' : ''}`}
-                  onClick={() => onSelect(item.key)}
-                  aria-current={item.key === activeItem ? 'page' : undefined}
+                  to={item.path}
+                  className={({ isActive }) => `sidebar__link ${isActive ? 'is-active' : ''}`}
                 >
                   <span className="sidebar__link-icon">
                     <NavIcon itemKey={item.key} />
                   </span>
                   <span>{item.label}</span>
-                </button>
+                </NavLink>
               ))}
           </div>
         </section>

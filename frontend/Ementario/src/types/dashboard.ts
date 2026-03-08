@@ -1,3 +1,5 @@
+// Tipos do payload da Dashboard retornado pelo backend.
+// Esses contratos mantem o front consistente com a API /api/dashboard/.
 export type ActivityStatus = 'Sincronizado' | 'Desatualizado' | 'Manual'
 
 export interface ActivityItem {

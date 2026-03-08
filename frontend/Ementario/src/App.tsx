@@ -1,46 +1,36 @@
-import { useState } from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { AppLayout } from './components/layout/AppLayout'
 import { DashboardPage } from './pages/DashboardPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
-import { Sidebar } from './components/layout/Sidebar'
-import { navigationItems, type NavigationKey } from './types/navigation'
+import { navigationItems } from './types/navigation'
 import './App.css'
 
+// Este arquivo define as rotas publicas do front-end.
+// O layout principal e reutilizado em todas as paginas administrativas.
 function App() {
-  const [activePage, setActivePage] = useState<NavigationKey>('dashboard')
-
-  const activeItem = navigationItems.find((item) => item.key === activePage)
-  const pageDescriptions: Record<Exclude<NavigationKey, 'dashboard'>, string> = {
-    cursos:
-      'Área para consulta completa, filtros e edição das informações de cursos e disciplinas.',
-    configuracoes:
-      'Espaço para preferências da aplicação, parâmetros da sincronização e acesso de administradores.',
-    'status-api':
-      'Painel com saúde da API, jobs de extração Selenium e monitoramento de integridade dos dados.',
-  }
-
   return (
-    <div className="app-shell">
-      <Sidebar activeItem={activePage} onSelect={setActivePage} />
-      <div className="app-area">
-        <header className="app-topbar">
-          <span className="app-topbar__project">APIEmentário</span>
-          <span className="app-topbar__separator">/</span>
-          <span className="app-topbar__context">
-            {activeItem?.label.toLowerCase() ?? 'dashboard'}
-          </span>
-        </header>
-        <main className="app-main">
-          {activePage === 'dashboard' ? (
-            <DashboardPage />
-          ) : (
-            <PlaceholderPage
-              title={activeItem?.label ?? 'Tela'}
-              description={pageDescriptions[activePage as Exclude<NavigationKey, 'dashboard'>]}
-            />
-          )}
-        </main>
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+      <Route element={<AppLayout />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
+
+        {navigationItems
+          .filter((item) => item.key !== 'dashboard')
+          .map((item) => {
+            return (
+              <Route
+                key={item.key}
+                path={item.path}
+                element={<PlaceholderPage title={item.label} description={item.description} />}
+              />
+            )
+          })}
+      </Route>
+
+      {/* Fallback para qualquer URL invalida dentro do SPA */}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   )
 }
 
