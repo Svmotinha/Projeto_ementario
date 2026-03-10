@@ -48,8 +48,12 @@ def _resolve_activity_status(disciplina: Disciplina) -> str:
 @api_view(['GET'])
 def dashboard_overview(_request):
     total_cursos = Curso.objects.count()
-    sincronizados = Curso.objects.filter(
-        funcionamento_curso=Curso.Funcionamento.ATIVO).count()
+    
+    # ALTERAÇÃO: Usando a query consolidada para verificar se o funcionamento 
+    # foi alterado manualmente pelo usuário
+    sincronizados = Curso.objects.consolidados().filter(
+        funcionamento_curso_final=Curso.Funcionamento.ATIVO).count()
+        
     desatualizados = max(total_cursos - sincronizados, 0)
 
     latest_candidates = [
@@ -106,9 +110,12 @@ class UnidadeViewSet(viewsets.ModelViewSet):
     serializer_class = UnidadeSerializer
 
 
+# --- ALTERAÇÃO NO VIEWSET DO CURSO ---
 class CursoViewSet(viewsets.ModelViewSet):
-    queryset = Curso.objects.all().order_by('id_curso')
+    # Passamos a usar 'consolidados()' em vez de 'all()' para carregar as anotações
+    queryset = Curso.objects.consolidados().order_by('id_curso')
     serializer_class = CursoSerializer
+# ------------------------------------
 
 
 class CurriculoViewSet(viewsets.ModelViewSet):

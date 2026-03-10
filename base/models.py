@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.functions import Coalesce
 
 class Usuario(models.Model):
     id_usuario = models.AutoField(primary_key=True)
@@ -65,6 +66,25 @@ class Unidade(models.Model):
     def __str__(self):
         return self.nome_unidade
 
+# --- INÍCIO DA LÓGICA DE COALESCE ---
+class CursoManager(models.Manager):
+    def consolidados(self):
+        """
+        Retorna a query mesclando a tabela base (Selenium) com as edições do usuário.
+        Se o campo em 'edicao_usuario' for NULL, ele traz o valor da tabela base.
+        """
+        return self.select_related('edicao_usuario').annotate(
+            nome_curso_final=Coalesce('edicao_usuario__nome_curso', 'nome_curso'),
+            turno_curso_final=Coalesce('edicao_usuario__turno_curso', 'turno_curso'),
+            modalidade_curso_final=Coalesce('edicao_usuario__modalidade_curso', 'modalidade_curso'),
+            area_conhecimento_curso_final=Coalesce('edicao_usuario__area_conhecimento_curso', 'area_conhecimento_curso'),
+            funcionamento_curso_final=Coalesce('edicao_usuario__funcionamento_curso', 'funcionamento_curso'),
+            grau_academico_final=Coalesce('edicao_usuario__grau_academico', 'grau_academico'),
+            ato_autorizacao_curso_final=Coalesce('edicao_usuario__ato_autorizacao_curso', 'ato_autorizacao_curso'),
+            ato_reconhecimento_curso_final=Coalesce('edicao_usuario__ato_reconhecimento_curso', 'ato_reconhecimento_curso'),
+            conceito_mec_curso_final=Coalesce('edicao_usuario__conceito_mec_curso', 'conceito_mec_curso'),
+        )
+
 class Curso(models.Model):
     class Nivel(models.TextChoices):
         GRADUACAO = 'Graduação', 'Graduação'
@@ -100,6 +120,9 @@ class Curso(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Injetando o manager customizado
+    objects = CursoManager()
+
     class Meta:
         db_table = 'curso'
         indexes = [
@@ -109,6 +132,34 @@ class Curso(models.Model):
 
     def __str__(self):
         return f"{self.nome_curso} ({self.codigo_curso})"
+
+class CursoEdicaoUsuario(models.Model):
+    """
+    Guarda APENAS as modificações feitas via painel administrativo/usuário.
+    Campos nulos = fallback para a tabela 'Curso' (extração do Selenium).
+    """
+    curso = models.OneToOneField(
+        Curso, 
+        on_delete=models.CASCADE, 
+        related_name='edicao_usuario',
+        primary_key=True
+    )
+    
+    nome_curso = models.CharField(max_length=255, null=True, blank=True)
+    turno_curso = models.CharField(max_length=20, choices=Curso.Turno.choices, null=True, blank=True)
+    modalidade_curso = models.CharField(max_length=45, null=True, blank=True)
+    area_conhecimento_curso = models.CharField(max_length=100, null=True, blank=True)
+    funcionamento_curso = models.CharField(max_length=20, choices=Curso.Funcionamento.choices, null=True, blank=True)
+    grau_academico = models.CharField(max_length=100, null=True, blank=True)
+    ato_autorizacao_curso = models.TextField(null=True, blank=True)
+    ato_reconhecimento_curso = models.TextField(null=True, blank=True)
+    conceito_mec_curso = models.CharField(max_length=50, null=True, blank=True)
+
+    modificado_por = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'curso_edicao_usuario'
 
 class Curriculo(models.Model):
     class Regime(models.TextChoices):
