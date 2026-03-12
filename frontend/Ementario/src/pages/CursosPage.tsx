@@ -1,8 +1,19 @@
 import { useState } from 'react';
 import { Search, Plus, Pencil } from 'lucide-react';
 
+
+interface CourseRow {
+  id: string
+  code: string
+  name: string
+  department: string
+  credits: number
+  hours: number
+  status: 'Sincronizado' | 'Desatualizado' | 'Manual'
+  type: 'Graduacao' | 'Pos graduacao'
+}
 // Mock data matching the image
-const coursesData = [];
+const coursesData: CourseRow[] = [];
 
 export const CursosPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -166,7 +177,6 @@ export const CursosPage = () => {
             <p className="text-sm mt-1">A lista está vazia ou nenhum curso corresponde aos filtros.</p>
           </div>
         )}
-
         </div>
       </div>
     </div>
