@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { RecentActivityPanel } from '../components/dashboard/RecentActivityPanel'
 import { StatCard, type StatTone } from '../components/dashboard/StatCard'
-import type { DashboardResponse } from '../types/dashboard'
+import type { DashboardResponse } from '../types/dashboard.ts'
+import api from '../services/api'
 
 // Esta pagina consome o endpoint agregado da API (/api/dashboard/)
 // e transforma o retorno em cards de metricas + lista de atividade recente.
@@ -47,16 +48,8 @@ export function DashboardPage() {
     setErrorMessage(null)
 
     try {
-      const response = await fetch('/api/dashboard/', {
-        headers: { Accept: 'application/json' },
-      })
-
-      if (!response.ok) {
-        throw new Error(`Falha na API: ${response.status}`)
-      }
-
-      const payload = (await response.json()) as DashboardResponse
-      setDashboardData(payload)
+      const response = await api.get<DashboardResponse>('/dashboard/')
+      setDashboardData(response.data)
     } catch (_error) {
       setErrorMessage('Nao foi possivel carregar os dados em tempo real.')
     } finally {

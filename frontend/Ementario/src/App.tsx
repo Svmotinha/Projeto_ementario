@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
 import { DashboardPage } from './pages/DashboardPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
-import { navigationItems } from './types/navigation'
+import { navigationItems } from './types/navigation.ts'
 import { CursosPage } from './pages/CursosPage'
 import './App.css'
 
@@ -18,7 +18,7 @@ function App() {
         <Route path="/cursos" element={<CursosPage />} />
 
         {navigationItems
-          .filter((item) => item.key !== 'dashboard')
+          .filter((item) => item.key !== 'dashboard' && item.key !== 'cursos')
           .map((item) => {
             return (
               <Route

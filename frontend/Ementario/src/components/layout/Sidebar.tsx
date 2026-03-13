@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { navigationItems, type NavigationKey, type NavigationSection } from '../../types/navigation'
+import { navigationItems, type NavigationKey, type NavigationSection } from '../../types/navigation.ts'
 
 const sidebarSections: NavigationSection[] = ['Navegacao', 'Sistema']
 

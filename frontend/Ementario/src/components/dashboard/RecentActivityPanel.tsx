@@ -1,4 +1,4 @@
-import type { ActivityItem } from '../../types/dashboard'
+import type { ActivityItem } from '../../types/dashboard.ts'
 
 interface RecentActivityPanelProps {
   items: ActivityItem[]

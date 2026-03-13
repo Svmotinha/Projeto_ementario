@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom'
-import { navigationItems } from '../../types/navigation'
+import { navigationItems } from '../../types/navigation.ts'
 import { Sidebar } from './Sidebar'
 
 // Este layout encapsula a estrutura visual persistente da aplicacao:

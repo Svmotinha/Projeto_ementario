@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, Plus, Pencil } from 'lucide-react';
+import api from '../services/api';
+import type { Curso } from '../types/curso.ts';
 
 
 interface CourseRow {
@@ -10,16 +12,45 @@ interface CourseRow {
   credits: number
   hours: number
   status: 'Sincronizado' | 'Desatualizado' | 'Manual'
-  type: 'Graduacao' | 'Pos graduacao'
+  type: 'Graduação' | 'Pós-Graduação'
 }
-// Mock data matching the image
-const coursesData: CourseRow[] = [];
 
 export const CursosPage = () => {
+  const [courses, setCourses] = useState<Curso[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await api.get('/cursos/');
+        // DRF com DefaultRouter e paginação padrão retorna { count, next, previous, results }
+        // Se a paginação estiver desativada ou for o formato simples, pode ser direto o array.
+        // No settings.py está: 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', 'PAGE_SIZE': 20
+        setCourses(response.data.results || response.data);
+      } catch (error) {
+        console.error('Erro ao buscar cursos:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  const coursesData: CourseRow[] = courses.map(c => ({
+    id: c.id_curso.toString(),
+    code: c.codigo_curso,
+    name: c.nome_curso,
+    department: c.area_conhecimento_curso || 'N/A',
+    credits: 0, // Informação não disponível no modelo Curso diretamente
+    hours: 0,   // Informação não disponível no modelo Curso diretamente
+    status: c.inserido_manualmente ? 'Manual' : (c.funcionamento_curso === 'Em atividade' ? 'Sincronizado' : 'Desatualizado'),
+    type: c.nivel_curso
+  }));
 
   const filteredCourses = coursesData.filter(course => {
     const matchesSearch = course.name.toLowerCase().includes(searchTerm.toLowerCase()) || course.code.toLowerCase().includes(searchTerm.toLowerCase());
